@@ -15,7 +15,7 @@ Same logic as before, with real error visibility added. It was almost certainly 
 
 ## On "as fast as possible"
 
-`*/15` is close to the practical floor for free GitHub-hosted scheduled workflows — GitHub explicitly treats `schedule` as best-effort and can delay or skip runs under load, and disables schedules entirely after 60 days with no commits. Since this workflow commits `seen.json` on every run with a diff, disablement shouldn't be a real risk here, but expect occasional multi-minute drift regardless of the cron value — that's GitHub's scheduler, not something fixable in this script. `workflow_dispatch` is still there for manual runs any time.
+`*/15` is close to the practical floor for free GitHub-hosted scheduled workflows — GitHub explicitly treats `schedule` as best-effort and can delay or skip runs under load, and disables schedules entirely after 60 days with no commits. Since this workflow commits `seen.json` on every run with a diff, disablement shouldn't be a real risk here, but expect occasional multi-minute drift regardless of the cron value, that's GitHub's scheduler, not something fixable in this script. `workflow_dispatch` is still there for manual runs any time.
 
 ## If it still fails after this
 
