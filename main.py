@@ -187,14 +187,18 @@ def main():
         acc = entry["accession"]
         if acc in seen:
             continue
-        new_seen.append(acc)
         try:
             xml_url, raw_xml = find_form4_xml(entry["link"], user_agent)
             if not raw_xml:
+                # Confirmed no Form 4 XML exists for this filing — safe to mark seen permanently.
+                new_seen.append(acc)
                 continue
             form4 = parse_form4(raw_xml)
+            # Only mark seen after a successful fetch + parse, so transient
+            # SEC errors don't silently drop a filing forever.
+            new_seen.append(acc)
         except Exception as e:
-            print(f"Skipping {acc}: {e}")
+            print(f"Skipping {acc} (will retry next run): {e}")
             errors += 1
             continue
 
@@ -232,11 +236,6 @@ def main():
     save_json(STATE_FILE, new_seen[-MAX_SEEN:])
     print(f"Purchases found: {purchases_found}")
     print(f"Checked {len(entries)} filings, sent {alerts_sent} alert(s), {errors} error(s).")
-
-    if errors and alerts_sent == 0 and purchases_found == 0:
-        # Nothing fatal happened, but flag a fully-error run so it's visible in the Actions tab
-        # without spamming an email for a normal "no matching filings this cycle" run.
-        pass
 
 if __name__ == "__main__":
     main()
