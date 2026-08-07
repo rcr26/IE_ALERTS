@@ -203,6 +203,14 @@ def main():
             print(f"  {form4['ticker']} codes={codes}")
         if "P" in codes:
             purchases_found += 1
+            for t in form4["transactions"]:
+                if t["code"] == "P":
+                    try:
+                        v = float(t["shares"] or 0) * float(t["price"] or 0)
+                    except ValueError:
+                        v = 0
+                    flag = "MATCHES" if v >= config.get("min_value", 0) else "below min_value"
+                    print(f"    P buy: {form4['ticker']} ${v:,.0f} ({flag})")
 
         ok, matched = matches_filters(form4, config)
         if not ok:
@@ -216,8 +224,9 @@ def main():
         try:
             send_ntfy(ntfy_topic, f"{label}: insider buy ${total:,.0f}", "\n".join(msg_lines), link=xml_url)
             alerts_sent += 1
+            print(f"  ALERT SENT: {label} ${total:,.0f} -> ntfy.sh/{ntfy_topic}")
         except Exception as e:
-            print(f"Alert failed for {acc}: {e}")
+            print(f"  ALERT FAILED for {acc}: {e}")
             errors += 1
 
     save_json(STATE_FILE, new_seen[-MAX_SEEN:])
