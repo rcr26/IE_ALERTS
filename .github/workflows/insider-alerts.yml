@@ -1,7 +1,5 @@
 name: Insider Trade Alerts
 on:
-  schedule:
-    - cron: '*/5 11-23,0-6 * * 1-5'
   workflow_dispatch: {}
 permissions:
   contents: write
